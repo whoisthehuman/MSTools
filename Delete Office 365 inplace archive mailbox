@@ -1,0 +1,29 @@
+# Define the user's email address
+$userEmailAddress = "user@example.com"
+
+# Connect to Exchange Online PowerShell
+# Make sure you have the required permissions to perform this action
+# You might need to install and import the Exchange Online PowerShell module
+# Install-Module -Name ExchangeOnlineManagement
+# Connect-ExchangeOnline -UserPrincipalName <YourAdminAccount>
+
+# Get the user's mailbox information
+$userMailbox = Get-Mailbox -Identity $userEmailAddress
+
+# Check if the user has an archive mailbox
+if ($userMailbox.ArchiveStatus -eq "Active") {
+    # Disable the archive
+    Disable-Mailbox -Identity $userEmailAddress -Archive
+
+    # Confirm if you want to permanently remove the archive
+    $confirmation = Read-Host "Do you want to permanently remove the archive? (Y/N)"
+    if ($confirmation -eq "Y" -or $confirmation -eq "y") {
+        # Permanently remove the archive
+        Remove-Mailbox -Identity $userEmailAddress -Archive -Confirm:$false
+        Write-Host "In-Place Archive mailbox for $userEmailAddress has been permanently removed."
+    } else {
+        Write-Host "In-Place Archive mailbox removal canceled."
+    }
+} else {
+    Write-Host "The user does not have an active In-Place Archive mailbox."
+}
